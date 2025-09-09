@@ -15,6 +15,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    // 파라미터로 변경
 
     // 게시글 생성
     @PostMapping("/create")
@@ -42,8 +43,8 @@ public class BoardController {
     }
 
     // 게시글 수정
-    @PatchMapping("/edit/{boardid}")
-    public String editBoard(@PathVariable("boardid") Integer boardId, BoardEdit boardEdit){
+    @PatchMapping("/edit")
+    public String editBoard(@RequestParam("boardid") Integer boardId, BoardEdit boardEdit){
         boardService.edit(boardId, boardEdit);
         return "게시글 수정 완료 id: " + boardId;
     }
