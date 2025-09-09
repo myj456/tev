@@ -33,6 +33,10 @@ public class Comments {
     private LocalDateTime editedAt;
 
     // CRUD 완료후 매핑할 예정.
+    @Comment("게시글 id")
+    private Integer boardId;
+
+    // CRUD 완료후 매핑할 예정.
     @Comment("댓글 작성자")
     private Integer userId;
 }
