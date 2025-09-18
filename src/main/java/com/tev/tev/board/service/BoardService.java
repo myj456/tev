@@ -1,13 +1,16 @@
 package com.tev.tev.board.service;
 
-import com.tev.tev.board.dto.BoardCreate;
-import com.tev.tev.board.dto.BoardEdit;
+import com.tev.tev.board.dto.request.BoardRequest;
+import com.tev.tev.board.dto.response.BoardListResponse;
+import com.tev.tev.board.dto.response.BoardResponse;
+import com.tev.tev.board.dto.request.BoardUpdate;
 import com.tev.tev.board.entity.Board;
 import com.tev.tev.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -16,42 +19,63 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    // 게시글 생성 비지니스 로직
-    public void create(BoardCreate boardCreate){
-        Board board = new Board();
-        board.setTitle(boardCreate.getTitle());
-        board.setContent(boardCreate.getContent());
-        board.setUserId(boardCreate.getUserId());
-        board.setBoard_createdAt(LocalDateTime.now());
+    // 게시글 생성
+    public Integer saveBoard(BoardRequest boardRequest){
+        // TODO: 유저 정보 확인
+
+        // 요청받은 게시글 내용을 저장
+        Board board = Board.builder()
+                .title(boardRequest.getTitle())
+                .content(boardRequest.getContent())
+                .createdAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .modifiedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .build();
+
+        // save() : DB 저장 후 지정된 엔티티 객체를 반환함.
         boardRepository.save(board);
+        return board.getBoardId();
     }
 
-    // 게시글 모두 조회
-    public List<Board> list(){
-        return boardRepository.findAll();
+    // 게시글 전체 조회
+    public List<BoardListResponse> getBoardList(){
+        List<Board> boardList = boardRepository.findAll();
+        return boardList.stream().map(BoardListResponse::from).toList();
     }
 
-    // 게시글 조회 - id
-    public Board view(Integer boardId){
-        return boardRepository.findByBoardId(boardId);
+    // 게시글 상세 조회
+    public BoardResponse getBoardById(Integer boardId){
+        Board board = boardRepository.findById(boardId).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 게시판입니다. id: " + boardId));
+
+        // 조회수 증가
+        board.upViewCount();
+        board.setViewCount(board.getViewCount());
+        boardRepository.save(board);
+        return BoardResponse.from(board);
     }
 
-    // 유저가 작성한 게시글 조회
-    public List<Board> userList(Integer userId){
-        return boardRepository.findByUserId(userId);
-    }
+    // TODO: 게시글 조회 - 유저 id
 
     // 게시글 수정
-    public void edit(Integer boardId, BoardEdit boardEdit){
-        Board board = boardRepository.findByBoardId(boardId);
-        board.setTitle(boardEdit.getTitle());
-        board.setContent(boardEdit.getContent());
-        board.setBoard_editedAt(LocalDateTime.now());
-        boardRepository.save(board);
+    public BoardResponse updateBoard(Integer boardId, BoardUpdate boardUpdate){
+        Board board = boardRepository.findById(boardId).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 게시판입니다. id: " + boardId));
+
+        if(boardUpdate.update(board)){
+            board.setModifiedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            boardRepository.save(board);
+            return BoardResponse.from(board);
+        }
+
+        //TODO: 커스텀 예외처리로 변경 ()
+        return null;
     }
 
     // 게시글 삭제
     public void delete(Integer boardId){
-        boardRepository.deleteById(boardId);
+        Board board = boardRepository.findById(boardId).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 게시글입니다. id: " + boardId));
+
+        boardRepository.delete(board);
     }
 }
