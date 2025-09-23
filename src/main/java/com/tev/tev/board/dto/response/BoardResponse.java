@@ -21,7 +21,7 @@ public class BoardResponse {
     private List<CommentResponse> commentList;
 
     // entity -> dto
-    public static BoardResponse from(Board board){
+    public static BoardResponse from(Board board, List<CommentResponse> comments){
         return BoardResponse.builder()
                 .boardId(board.getBoardId())
                 .title(board.getTitle())
@@ -30,9 +30,7 @@ public class BoardResponse {
                 .likeCount(board.getLikeCount())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
-                .commentList(board.getCommentsList().stream()
-                        .map(CommentResponse::from)
-                        .toList())
+                .commentList(comments)
                 .build();
     }
 

@@ -23,7 +23,7 @@ public class CommentController {
     private final BoardRepository boardRepository;
 
     // 댓글 생성
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ApiResponse<String>> commentCreate(@PathVariable("boardid") Integer boardId,
                                                    CommentRequest commentRequest){
         if(!boardRepository.existsById(boardId)){
@@ -51,7 +51,7 @@ public class CommentController {
                     .body(ApiResponse.fail("존재하지 않는 댓글입니다. id: " + commentId));
         }
 
-        CommentResponse commentResponse = commentService.CommentEdit(boardId, commentId, commentUpdate);
+        CommentResponse commentResponse = commentService.commentEdit(boardId, commentId, commentUpdate);
         if(commentResponse == null){
             return ResponseEntity
                     .ok(ApiResponse.success("수정된 사항이 없습니다.", null));

@@ -26,8 +26,8 @@ public class ApiResponse<T> {
     }
 
     // 요청 에러 - 메세지 + 에러메세지
-    public static <T> ApiResponse<T> error(List<String> errors){
-        return new ApiResponse<>(false, null, errors, null);
+    public static <T> ApiResponse<T> error(String message, List<String> errors){
+        return new ApiResponse<>(false, message, errors, null);
     }
 
     // 요청 실패
