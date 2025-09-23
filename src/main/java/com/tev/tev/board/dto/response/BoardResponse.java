@@ -33,6 +33,4 @@ public class BoardResponse {
                 .commentList(comments)
                 .build();
     }
-
-
 }
