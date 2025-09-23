@@ -7,15 +7,11 @@ import com.tev.tev.comment.dto.CommentResponse;
 import com.tev.tev.comment.dto.CommentUpdate;
 import com.tev.tev.comment.entity.Comments;
 import com.tev.tev.comment.repository.CommentsRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.stream.events.Comment;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

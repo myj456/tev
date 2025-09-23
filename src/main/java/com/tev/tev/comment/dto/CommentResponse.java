@@ -1,6 +1,5 @@
 package com.tev.tev.comment.dto;
 
-import com.tev.tev.board.entity.Board;
 import com.tev.tev.comment.entity.Comments;
 import lombok.Builder;
 import lombok.Data;

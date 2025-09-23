@@ -1,6 +1,5 @@
 package com.tev.tev.board.entity;
 
-//import com.tev.tev.comment.entity.Comments;
 import com.tev.tev.comment.entity.Comments;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
