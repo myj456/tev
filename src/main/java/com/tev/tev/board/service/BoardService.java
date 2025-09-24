@@ -42,11 +42,19 @@ public class BoardService {
         return board.getBoardId();
     }
 
+    // 게시글 검색 (title)
+    public List<BoardListResponse> searchBoardList(String keyword, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Board> searchBoards = boardRepository.findByTitleContainingOrderByBoardIdDescCreatedAtDesc(keyword, pageable);
+        return searchBoards.stream().map(BoardListResponse::from).toList();
+    }
+
     // 게시글 전체 조회
     public List<BoardListResponse> getBoardList(int page, int size){
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Board> boards = boardRepository.findAllByOrderByBoardIdDescCreatedAtDesc(pageable);
+        List<Board> boards = boardRepository.findAllByOrderByBoardIdDescCreatedAtDesc(pageable);
         return boards.stream().map(BoardListResponse::from).toList();
     }
 

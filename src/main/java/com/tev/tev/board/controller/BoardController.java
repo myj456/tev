@@ -34,7 +34,18 @@ public class BoardController {
                         .success("게시글 생성 성공 id:" + boardId));
     }
 
-    // 게시글 모두 조회
+    // 게시글 검색 (title)
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<BoardListResponse>>> searchBoardList(@RequestParam(value = "search") String keyword,
+                                                                                @RequestParam(defaultValue = "0") int page,
+                                                                                @RequestParam(defaultValue = "10") int size){
+        List<BoardListResponse> boardListResponses = boardService.searchBoardList(keyword, page, size);
+        return ResponseEntity
+                .ok(ApiResponse.success(boardListResponses));
+
+    }
+
+    // 게시글 전체 조회
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<List<BoardListResponse>>> boardList(@RequestParam(defaultValue = "0") int page,
                                                                           @RequestParam(defaultValue = "10") int size){
@@ -93,6 +104,4 @@ public class BoardController {
         boardService.delete(boardId);
         return ResponseEntity.ok(ApiResponse.success("게시글 삭제 성공 id: " + boardId));
     }
-
-
 }
