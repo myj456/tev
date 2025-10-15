@@ -36,7 +36,4 @@ public class JoinService {
 
         return userRepository.save(user).getNickname();
     }
-
-
-
 }
