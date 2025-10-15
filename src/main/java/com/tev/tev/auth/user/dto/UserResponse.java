@@ -1,6 +1,6 @@
-package com.tev.tev.auth.common.dto;
+package com.tev.tev.auth.user.dto;
 
-import com.tev.tev.auth.common.entity.User;
+import com.tev.tev.auth.user.entity.User;
 import lombok.Builder;
 import lombok.Data;
 
@@ -19,7 +19,7 @@ public class UserResponse {
                 .id(user.getUserId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
-                .role(user.getRole())
+                .role(user.getRole().name())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

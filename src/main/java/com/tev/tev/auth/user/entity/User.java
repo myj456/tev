@@ -1,4 +1,4 @@
-package com.tev.tev.auth.common.entity;
+package com.tev.tev.auth.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @AllArgsConstructor
@@ -38,5 +39,6 @@ public class User {
 
     @Comment("유저 권한")
     @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Roles role;
 }

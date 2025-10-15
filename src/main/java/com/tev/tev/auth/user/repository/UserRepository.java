@@ -1,8 +1,10 @@
-package com.tev.tev.auth.common.repository;
+package com.tev.tev.auth.user.repository;
 
-import com.tev.tev.auth.common.entity.User;
+import com.tev.tev.auth.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
@@ -10,5 +12,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByEmail(String email);
 
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 }
