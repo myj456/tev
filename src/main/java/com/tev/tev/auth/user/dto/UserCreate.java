@@ -6,8 +6,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -16,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 @Data
 @Valid
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserCreate {
 
     @Email(message = "잘못된 이메일 형식입니다.")
@@ -37,7 +41,7 @@ public class UserCreate {
                 .email(this.email)
                 .password(passwordEncoder.encode(this.password))
                 .nickname(this.nickname)
-                .createdAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:ss")))
+                .createdAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .role(Roles.ROLE_USER)
                 .build();
     }

@@ -24,8 +24,8 @@ public class SecurityUtil {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 인증 객체가 없는 경우 빈 Optional 반환
-        if(authentication == null){
-            logger.debug("Security Context에 인증 정보가 없습니다.");
+        if(authentication == null || authentication.getName() == null){
+            logger.debug("No authentication information");
             return Optional.empty();
         }
 
@@ -40,7 +40,7 @@ public class SecurityUtil {
             username = (String) authentication.getPrincipal();
         }
 
-        // Optional로 반환하여 null 처리 가능하도록 함.
+        // Optional 반환하여 null 처리 가능하도록 함.
         return Optional.ofNullable(username);
     }
 }

@@ -1,11 +1,10 @@
 package com.tev.tev.auth.login.service;
 
+import com.tev.tev.auth.login.TokenBlacklistService;
 import com.tev.tev.auth.login.jwt.TokenProvider;
 import com.tev.tev.auth.login.jwt.dto.RefreshTokenRequest;
 import com.tev.tev.auth.login.jwt.dto.TokenDto;
 import com.tev.tev.auth.login.jwt.dto.TokenResponse;
-import com.tev.tev.auth.login.jwt.entity.RefreshToken;
-import com.tev.tev.auth.login.jwt.repository.RefreshTokenRepository;
 import com.tev.tev.auth.user.dto.UserLogin;
 import com.tev.tev.auth.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -28,10 +25,9 @@ public class LoginService {
 
     private final TokenProvider tokenProvider; // jwt 생성 + 유효성 검사 클래스
     private final AuthenticationManagerBuilder authenticationManagerBuilder; //  Spring Security 의 인증 관리자 빌더
+    private final TokenBlacklistService tokenBlacklistService;
 
     private final UserRepository userRepository;
-
-    private final RefreshTokenRepository refreshTokenRepository;
 
     // 로그인 요청 시 토큰 발급
     public Optional<TokenResponse> makeTokens(UserLogin userLogin){
@@ -68,30 +64,16 @@ public class LoginService {
         String refreshTokenValue = request.getRefreshToken();
         log.info("유저의 refresh token value=" + refreshTokenValue);
 
-        // DB에서 refresh Token 조회
-        RefreshToken validRefreshToken =
-                refreshTokenRepository.findById(refreshTokenValue)
-                        .orElseThrow(() -> new IllegalArgumentException("invalid Refresh token"));
-
-        TokenDto tokenDto = null;
-
-        // refresh Token 만료 시 삭제한 후 null 반환
-        if(isTokenExpired(validRefreshToken)){
-            refreshTokenRepository.delete(validRefreshToken);
+        // redis 기반 refresh Token 조회
+        if(!tokenProvider.validateRefreshToken(refreshTokenValue)){
+            log.info("Invalid or expired refresh token");
             return Optional.empty();
         }
-        log.info("DB refresh token value=" + validRefreshToken.getToken());
-
         // 새로운 access Token 생성
         String accessToken = tokenProvider.createToken(authentication, true);
 
-        tokenDto = new TokenDto(accessToken);
-        return Optional.ofNullable(tokenDto);
-    }
-
-    // refresh Token 만료 여부
-    public boolean isTokenExpired(RefreshToken refreshToken){
-        return refreshToken.getExpiryDate().isBefore(LocalDateTime.now());
+        TokenDto tokenDto = new TokenDto(accessToken);
+        return Optional.of(tokenDto);
     }
 
     // 사용자 nickname 반환
@@ -99,5 +81,11 @@ public class LoginService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("\"존재하지 않는 이메일 정보입니다. email=" + email))
                 .getNickname();
+    }
+
+    // 로그아웃
+    public void logout(String accessToken, String email){
+        tokenProvider.deleteRefreshToken(email);
+        tokenBlacklistService.addBlacklist(accessToken);
     }
 }

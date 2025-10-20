@@ -1,7 +1,6 @@
 package com.tev.tev.auth.login.jwt;
 
-import com.tev.tev.auth.login.jwt.entity.RefreshToken;
-import com.tev.tev.auth.login.jwt.repository.RefreshTokenRepository;
+import com.tev.tev.redis.dao.RedisDao;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -14,12 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -40,7 +38,7 @@ public class TokenProvider implements InitializingBean {
 
     private Key key;
 
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisDao redisDao;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -71,25 +69,14 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
-    // Refresh Token 생성 후 DB에 저장
+    // Refresh Token 생성 후 Redis 에 저장
     // @Param authentication 인증 정보를 포함한 Authentication 객체
     public String createAndPersistRefreshTokenForUser(Authentication authentication){
+
         String refreshToken = this.createToken(authentication, false); // RefreshToken 생성
+        String username = authentication.getName();
 
-        // 만료 날짜 설정
-        long now = (new Date()).getTime();
-        Date validity = new Date(now + REFRESH_TOKEN_EXPIRE_TIME);
-        Instant instant = validity.toInstant();
-        LocalDateTime expiryDate = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-        // RefreshToken 엔티티 생성 및 저장
-        String email = authentication.getName();
-        RefreshToken refreshTokenEntity = RefreshToken.builder()
-                .email(email)
-                .token(refreshToken)
-                .expiryDate(expiryDate)
-                .build();
-        refreshTokenRepository.save(refreshTokenEntity);
+        redisDao.setValues(username, refreshToken, Duration.ofMillis(REFRESH_TOKEN_EXPIRE_TIME));
 
         return refreshToken;
     }
@@ -109,8 +96,24 @@ public class TokenProvider implements InitializingBean {
                 .toList();
 
         // 인증 객체 생성
-        User principal = new User(claims.getSubject(), "", authorities);
+        UserDetails principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    // 토큰에서 username(email) 추출
+    public String getUsernameFromToken(String token){
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // 사용자 이름(subject) 반환
+            return claims.getSubject();
+        } catch (ExpiredJwtException e){
+          return e.getClaims().getSubject();
+        }
     }
 
     // JWT 토큰의 유효성 검사
@@ -129,5 +132,44 @@ public class TokenProvider implements InitializingBean {
             log.info("JWT 토큰이 잘못되었습니다.");
         }
         return false; // 토큰이 유효하지 않은 경우
+    }
+
+    // RefreshToken 검증
+    public boolean validateRefreshToken(String token){
+        // 토큰 검증
+        if (!validateToken(token)) return false;
+
+        try {
+            String username = getUsernameFromToken(token);
+
+            // Redis 에 저장된 Refresh Token 추출하기
+            String redisToken = (String) redisDao.getValues(username);
+            return token.equals(redisToken);
+        } catch (Exception e){
+            log.info("RefreshToken Validation Failed", e);
+            return false;
+        }
+    }
+
+    // Jwt 토큰 복호화
+    public Claims parseClaims(String accessToken){
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .getBody();
+        } catch (ExpiredJwtException e){
+            return e.getClaims();
+        }
+    }
+
+    // RefreshToken 삭제
+    public void deleteRefreshToken(String username){
+        if(username == null || username.trim().isEmpty()){
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+
+        redisDao.deleteValues(username);
     }
 }

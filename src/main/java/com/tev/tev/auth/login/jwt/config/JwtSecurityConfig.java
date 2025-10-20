@@ -1,5 +1,6 @@
 package com.tev.tev.auth.login.jwt.config;
 
+import com.tev.tev.auth.login.TokenBlacklistService;
 import com.tev.tev.auth.login.jwt.JwtFilter;
 import com.tev.tev.auth.login.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +14,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     private final TokenProvider tokenProvider;
+    private final TokenBlacklistService tokenBlacklistService;
 
     // TokenProvider 주입 후 JwtFilter를 통해 Security 로직에 필터 등록
     @Override
     public void configure(HttpSecurity http){
-        JwtFilter customFilter = new JwtFilter(tokenProvider);
-        http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(
+                new JwtFilter(tokenProvider, tokenBlacklistService),
+                UsernamePasswordAuthenticationFilter.class);
     }
 }

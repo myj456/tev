@@ -1,12 +1,10 @@
 package com.tev.tev.auth.login.controller;
 
 import com.tev.tev.auth.login.jwt.JwtFilter;
-import com.tev.tev.auth.login.jwt.dto.LogoutDto;
+import com.tev.tev.auth.login.jwt.TokenProvider;
 import com.tev.tev.auth.login.jwt.dto.RefreshTokenRequest;
 import com.tev.tev.auth.login.jwt.dto.TokenDto;
 import com.tev.tev.auth.login.jwt.dto.TokenResponse;
-import com.tev.tev.auth.login.jwt.entity.RefreshToken;
-import com.tev.tev.auth.login.jwt.repository.RefreshTokenRepository;
 import com.tev.tev.auth.user.dto.UserLogin;
 import com.tev.tev.common.ApiResponse;
 import com.tev.tev.auth.login.service.LoginService;
@@ -17,10 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -31,10 +26,10 @@ import java.util.Optional;
 public class LoginController {
 
     private final LoginService loginService;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenProvider tokenProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<TokenResponse>> userLogin(@Valid @RequestBody UserLogin userLogin){
+    public ResponseEntity<ApiResponse<TokenResponse>> userLogin(@Valid @RequestBody UserLogin userLogin) {
 
         //.토큰 생성
         Optional<TokenResponse> tokenResponse
@@ -56,36 +51,32 @@ public class LoginController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout(@RequestBody LogoutDto logoutDto){
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByToken(logoutDto.getRefreshToken());
+    public ResponseEntity<ApiResponse<String>> logout(@RequestHeader("Authorization") String authorization) {
+        String accessToken = authorization.substring(7);
 
-        if(refreshToken.isPresent()){
-            refreshTokenRepository.delete(refreshToken.get()); // DB refresh token 삭제
-            return ResponseEntity
-                    .ok(ApiResponse.success("로그아웃 성공"));
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.fail("유효하지 않은 refresh Token"));
-        }
+        String email = tokenProvider.getUsernameFromToken(accessToken);
+
+        loginService.logout(accessToken, email);
+        return ResponseEntity
+                .ok(ApiResponse.success("로그아웃 성공"));
     }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<ApiResponse<?>> refreshToken(RefreshTokenRequest request,
-                                          Authentication authentication){
-        try{
+                                                       Authentication authentication) {
+        try {
             // 새로운 access Token 발급
             Optional<TokenDto> tokenDto = loginService.makeNewAccessToken(request, authentication);
 
             // 토큰 생성 성공 시 새 access Token 반환
-            if(tokenDto.isPresent()){
+            if (tokenDto.isPresent()) {
                 return ResponseEntity
                         .ok(ApiResponse.success(tokenDto.get()));
             } else {
                 return ResponseEntity
                         .ok(ApiResponse.fail("유효하지 않은 refresh Token 입니다. 로그인을 다시 해주세요."));
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error(e.getMessage()));
