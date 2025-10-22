@@ -51,6 +51,7 @@ public class SecurityConfig {
                 // 로그인 및 회원가입 api 요청 허용 (jwt 토큰 X)
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
                 // exception handling 할 시 커스텀 클래스 추가

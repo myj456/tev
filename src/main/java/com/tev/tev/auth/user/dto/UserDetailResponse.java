@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserResponse {
+public class UserDetailResponse {
     private Integer id;
     private String nickname;
     private String email;
@@ -14,8 +14,8 @@ public class UserResponse {
     private String createdAt;
 
     // entity -> dto
-    public static UserResponse from(User user){
-        return UserResponse.builder()
+    public static UserDetailResponse from(User user){
+        return UserDetailResponse.builder()
                 .id(user.getUserId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
