@@ -1,10 +1,12 @@
 package com.tev.tev.auth.login.controller;
 
+import com.tev.tev.auth.admin.service.AdminService;
 import com.tev.tev.auth.login.jwt.JwtFilter;
 import com.tev.tev.auth.login.jwt.TokenProvider;
 import com.tev.tev.auth.login.jwt.dto.RefreshTokenRequest;
 import com.tev.tev.auth.login.jwt.dto.TokenDto;
 import com.tev.tev.auth.login.jwt.dto.TokenResponse;
+import com.tev.tev.auth.user.dto.UserBlockResponse;
 import com.tev.tev.auth.user.dto.UserLogin;
 import com.tev.tev.common.ApiResponse;
 import com.tev.tev.auth.login.service.LoginService;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -26,10 +29,20 @@ import java.util.Optional;
 public class LoginController {
 
     private final LoginService loginService;
+    private final AdminService adminService;
     private final TokenProvider tokenProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<TokenResponse>> userLogin(@Valid @RequestBody UserLogin userLogin) {
+    public ResponseEntity<ApiResponse<?>> userLogin(@Valid @RequestBody UserLogin userLogin) {
+
+        String email = userLogin.getEmail();
+
+        UserBlockResponse userBlockResponse = adminService.userBlock(email);
+        if(!Objects.isNull(userBlockResponse)){
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.fail("차단된 유저", userBlockResponse));
+        }
 
         //.토큰 생성
         Optional<TokenResponse> tokenResponse
@@ -38,7 +51,7 @@ public class LoginController {
         // HttpHeaders 생성
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        // Authorization 헤더에 Bearer + AccessToken을 추가
+        // Authorization 헤더에 Bearer + AccessToken 을 추가
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + tokenResponse.get().getAccessToken());
 
         String username = loginService.getUsername(userLogin.getEmail());

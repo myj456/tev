@@ -1,6 +1,7 @@
 package com.tev.tev.auth.admin.controller;
 
 import com.tev.tev.auth.admin.service.AdminService;
+import com.tev.tev.auth.user.dto.UserBlockCreate;
 import com.tev.tev.auth.user.dto.UserDetailResponse;
 import com.tev.tev.auth.user.dto.UserListResponse;
 import com.tev.tev.auth.user.repository.UserRepository;
@@ -8,10 +9,7 @@ import com.tev.tev.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,5 +45,23 @@ public class AdminController {
         UserDetailResponse userDetailResponse = adminService.getUserDetails(userId);
         return ResponseEntity
                 .ok(ApiResponse.success(userDetailResponse));
+    }
+
+    // 유저 차단 추가
+    @PostMapping("/block")
+    public ResponseEntity<ApiResponse<String>> userBlock(@RequestBody UserBlockCreate userBlockCreate){
+        adminService.userBlockCreate(userBlockCreate);
+
+        return ResponseEntity
+                .ok(ApiResponse.success("차단 완료 userid=" + userBlockCreate.getUserId()));
+    }
+
+    // 유저 차단 취소
+    @DeleteMapping("/block/cancel")
+    public ResponseEntity<ApiResponse<String>> userBlockCancel(@RequestParam("blockuserid") Integer userId){
+        adminService.userBlockDelete(userId);
+
+        return ResponseEntity
+                .ok(ApiResponse.success("차단 취소 userId=" + userId));
     }
 }

@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,8 +33,12 @@ public class ApiResponse<T> {
         return new ApiResponse<>(false, message, data);
     }
 
-    // 요청 실패
+    // 요청 실패 - 메세지
     public static <T> ApiResponse<T> fail(String message){
         return new ApiResponse<>(false, message, null);
+    }
+
+    public static <T> ApiResponse<T> fail(String message, T data){
+        return new ApiResponse<>(false, message, data);
     }
 }
