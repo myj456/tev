@@ -22,18 +22,23 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, message, data);
     }
 
-    // 요청 에러 - 메세지
+    // 요청 에러 - 메세지 
     public static <T> ApiResponse<T> error(String message){
         return new ApiResponse<>(false, message, null);
     }
-
-    // 요청 에러 - 메세지 + 데이터
+  
+    // 요청 에러 - 메세지 + 데이터 
     public static <T> ApiResponse<T> error(String message, T data){
         return new ApiResponse<>(false, message, data);
     }
 
-    // 요청 실패
+    // 요청 실패 - 메세지
     public static <T> ApiResponse<T> fail(String message){
         return new ApiResponse<>(false, message, null);
+    }
+
+    // 요청 실패 - 메세지 + 
+    public static <T> ApiResponse<T> fail(String message, T data){
+        return new ApiResponse<>(false, message, data);
     }
 }

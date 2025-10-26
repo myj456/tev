@@ -18,11 +18,23 @@ spring:
         format-sql: true
 
     hibernate:
-      ddl-auto: none
+
+  # Redis 설정
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      ddl-auto: update
 
 # env Setting
   config:
     import: optional:file:.env[.properties]
 
+# JWT - HS512
+jwt:
+  secret: ASwidfEJisnenjkIEKNieiKQ38V93YR7894hnfn38urh37s3jEYR83HDF8h93nfjhedf8wkj93h8ehASUJe8cxWhudSeuxhe23x3hnd8
+
 server:
   port: 8090
+  
+  
