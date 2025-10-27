@@ -1,5 +1,6 @@
 package com.tev.tev.board.entity;
 
+import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.comment.entity.Comments;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -57,9 +58,9 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Comments> commentsList;
 
-    // CRUD 완료후 매핑할 예정.
-//    @Comment("유저 아이디")
-//    private Integer userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     // 조회수 증가
     public void upViewCount(){

@@ -1,11 +1,15 @@
 package com.tev.tev.auth.user.entity;
 
+import com.tev.tev.board.entity.Board;
+import com.tev.tev.comment.entity.Comments;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -40,4 +44,10 @@ public class User {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Roles role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Board> boardList;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comments> commentList;
 }

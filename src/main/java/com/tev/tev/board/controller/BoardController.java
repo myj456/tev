@@ -6,8 +6,8 @@ import com.tev.tev.board.dto.response.BoardResponse;
 import com.tev.tev.board.dto.request.BoardUpdate;
 import com.tev.tev.board.repository.BoardRepository;
 import com.tev.tev.board.service.BoardService;
-import com.tev.tev.comment.service.CommentService;
 import com.tev.tev.common.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +22,9 @@ public class BoardController {
 
     private final BoardService boardService;
     private final BoardRepository boardRepository;
-
-    private final CommentService commentService;
-
     // 게시글 생성
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<String>> boardCreate(BoardRequest boardRequest){
+    public ResponseEntity<ApiResponse<String>> boardCreate(@Valid @RequestBody BoardRequest boardRequest){
         Integer boardId = boardService.saveBoard(boardRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse
@@ -35,34 +32,21 @@ public class BoardController {
     }
 
     // 게시글 검색 (title)
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<BoardListResponse>>> searchBoardList(@RequestParam(value = "search") String keyword,
-                                                                                @RequestParam(defaultValue = "0") int page,
-                                                                                @RequestParam(defaultValue = "10") int size){
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<List<BoardListResponse>>> searchBoardList(@RequestParam(value = "search", required = false) String keyword,
+                                                                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                @RequestParam(value = "size", defaultValue = "10") int size){
         List<BoardListResponse> boardListResponses = boardService.searchBoardList(keyword, page, size);
         return ResponseEntity
                 .ok(ApiResponse.success(boardListResponses));
 
     }
 
-    // 게시글 전체 조회
-    @GetMapping("/list")
-    public ResponseEntity<ApiResponse<List<BoardListResponse>>> boardList(@RequestParam(defaultValue = "0") int page,
-                                                                          @RequestParam(defaultValue = "10") int size){
-        List<BoardListResponse> boardList = boardService.getBoardList(page, size);
-        if(boardList.isEmpty()){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND).body(ApiResponse.success("게시글이 존재하지 않습니다.", null));
-        }
-        return ResponseEntity
-                .ok(ApiResponse.success(boardList));
-    }
-
     // 게시글 조회 - id
     @GetMapping("/{boardid}")
     public ResponseEntity<ApiResponse<BoardResponse>> viewBoard(@PathVariable("boardid") Integer boardId,
-                                                                @RequestParam(required = false) Long cursorId,
-                                                                @RequestParam(defaultValue = "15") int pageSize){
+                                                                @RequestParam(value = "cursorId", required = false) Long cursorId,
+                                                                @RequestParam(value = "pageSize", defaultValue = "15") int pageSize){
         if(!boardRepository.existsById(boardId)){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.fail("존재하지 않는 게시글입니다. id: " + boardId));
@@ -73,11 +57,12 @@ public class BoardController {
                 .ok(ApiResponse.success("게시글 조회 성공", boardResponse));
     }
 
-    // TODO: 유저가 작성한 게시글 조회
-
     // 게시글 수정
     @PatchMapping("/{boardid}/edit")
-    public ResponseEntity<ApiResponse<BoardResponse>> editBoard(@PathVariable("boardid") Integer boardId, BoardUpdate boardUpdate){
+    public ResponseEntity<ApiResponse<BoardResponse>> editBoard(@PathVariable("boardid") Integer boardId,
+                                                                @Valid @RequestBody BoardUpdate boardUpdate){
+
+
         if(!boardRepository.existsById(boardId)){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.fail("존재하지 않는 게시글입니다. id: " + boardId));

@@ -1,5 +1,7 @@
 package com.tev.tev.comment.service;
 
+import com.tev.tev.auth.user.entity.User;
+import com.tev.tev.auth.user.repository.UserRepository;
 import com.tev.tev.board.entity.Board;
 import com.tev.tev.board.repository.BoardRepository;
 import com.tev.tev.comment.dto.CommentRequest;
@@ -10,6 +12,8 @@ import com.tev.tev.comment.repository.CommentsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,18 +27,21 @@ public class CommentService {
 
     private final CommentsRepository commentsRepository;
     private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
 
     // 댓글 생성
     public Integer commentSave(Integer boardId, CommentRequest commentRequest){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetails userDetails = (UserDetails) principal;
+        String email = userDetails.getUsername();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다. email=" + email));
+
         Board board = boardRepository.findById(boardId).orElseThrow(() ->
                 new IllegalArgumentException("존재하지 않는 게시글입니다. id: " + boardId));
 
-        Comments comments = Comments.builder()
-                .content(commentRequest.getContent())
-                .createdAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .modifiedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .board(board)
-                .build();
+        Comments comments = commentRequest.toEntity(board, user);
 
         commentsRepository.save(comments);
         return comments.getCommentId();

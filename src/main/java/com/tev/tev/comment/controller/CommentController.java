@@ -7,6 +7,7 @@ import com.tev.tev.comment.dto.CommentUpdate;
 import com.tev.tev.comment.repository.CommentsRepository;
 import com.tev.tev.comment.service.CommentService;
 import com.tev.tev.common.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class CommentController {
     // 댓글 생성
     @PostMapping
     public ResponseEntity<ApiResponse<String>> commentCreate(@PathVariable("boardid") Integer boardId,
-                                                   CommentRequest commentRequest){
+                                                            @Valid @RequestBody CommentRequest commentRequest){
         if(!boardRepository.existsById(boardId)){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.fail("존재하지 않는 게시글입니다. id: " + boardId));
@@ -40,7 +41,7 @@ public class CommentController {
     @PatchMapping("/{commentid}")
     public ResponseEntity<ApiResponse<CommentResponse>> commentEdit(@PathVariable("boardid") Integer boardId,
                                                                     @PathVariable("commentid") Integer commentId,
-                                                                    CommentUpdate commentUpdate){
+                                                                    @Valid @RequestBody CommentUpdate commentUpdate){
         if(!boardRepository.existsById(boardId)){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.fail("존재하지 않는 게시글입니다. id: " + boardId));

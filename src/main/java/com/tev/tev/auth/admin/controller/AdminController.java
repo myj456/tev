@@ -23,7 +23,7 @@ public class AdminController {
 
     // 유저 정보 전체 조회 및 검색(name, email)
     @GetMapping("/list")
-    public ResponseEntity<ApiResponse<List<UserListResponse>>> getUserList(@RequestParam(value = "search", defaultValue = "") String name,
+    public ResponseEntity<ApiResponse<List<UserListResponse>>> getUserList(@RequestParam(value = "search", required = false) String name,
                                                          @RequestParam(value = "page", defaultValue = "0") int page,
                                                          @RequestParam(value = "size", defaultValue = "15") int size){
 

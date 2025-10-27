@@ -13,6 +13,7 @@ public class BoardResponse {
     private Integer boardId;
     private String title;
     private String content;
+    private String nickname;
     private Long viewCount;
     private Long likeCount;
     private String createdAt;
@@ -26,6 +27,7 @@ public class BoardResponse {
                 .boardId(board.getBoardId())
                 .title(board.getTitle())
                 .content(board.getContent())
+                .nickname(board.getUser().getNickname())
                 .viewCount(board.getViewCount())
                 .likeCount(board.getLikeCount())
                 .createdAt(board.getCreatedAt())

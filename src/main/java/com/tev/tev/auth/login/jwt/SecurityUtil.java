@@ -19,7 +19,6 @@ public class SecurityUtil {
 
     // 현재 인증된 사용자의 이름을 Optional로 반환
     public static Optional<String> getCurrentUsername(){
-
         // SecuritycontextHolder에서 인증 객체 가져오기
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

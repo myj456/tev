@@ -14,7 +14,6 @@ import java.util.List;
 @Getter
 @Builder
 public class CustomUserDetails implements UserDetails {
-
     private final String email;
     private final String password;
     private final String nickname;

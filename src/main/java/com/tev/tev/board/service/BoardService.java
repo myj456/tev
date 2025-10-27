@@ -1,5 +1,7 @@
 package com.tev.tev.board.service;
 
+import com.tev.tev.auth.user.entity.User;
+import com.tev.tev.auth.user.repository.UserRepository;
 import com.tev.tev.board.dto.request.BoardRequest;
 import com.tev.tev.board.dto.response.BoardListResponse;
 import com.tev.tev.board.dto.response.BoardResponse;
@@ -9,10 +11,12 @@ import com.tev.tev.board.repository.BoardRepository;
 import com.tev.tev.comment.dto.CommentResponse;
 import com.tev.tev.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,37 +29,41 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final CommentService commentService;
 
+    private final UserRepository userRepository;
+
     // 게시글 생성
     public Integer saveBoard(BoardRequest boardRequest){
-        // TODO: 유저 정보 확인
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetails userDetails = (UserDetails) principal;
+        String email = userDetails.getUsername();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다. email=" + email));
 
         // 요청받은 게시글 내용을 저장
-        Board board = Board.builder()
-                .title(boardRequest.getTitle())
-                .content(boardRequest.getContent())
-                .createdAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .modifiedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .build();
+        Board board = boardRequest.toEntity(user);
 
         // save() : DB 저장 후 지정된 엔티티 객체를 반환함.
         boardRepository.save(board);
         return board.getBoardId();
     }
 
-    // 게시글 검색 (title)
+    // 게시글 전체 조회 - 오프셋
     public List<BoardListResponse> searchBoardList(String keyword, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
 
-        List<Board> searchBoards = boardRepository.findByTitleContainingOrderByBoardIdDescCreatedAtDesc(keyword, pageable);
-        return searchBoards.stream().map(BoardListResponse::from).toList();
-    }
+        List<Board> searchBoards;
+        if(!StringUtils.hasText(keyword)){
+            searchBoards = boardRepository.findAllByOrderByBoardIdDescCreatedAtDesc(pageable);
+            return searchBoards.stream()
+                    .map(BoardListResponse::from)
+                    .toList();
+        }
 
-    // 게시글 전체 조회
-    public List<BoardListResponse> getBoardList(int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-
-        List<Board> boards = boardRepository.findAllByOrderByBoardIdDescCreatedAtDesc(pageable);
-        return boards.stream().map(BoardListResponse::from).toList();
+        searchBoards = boardRepository.findByTitleContainingOrderByBoardIdDescCreatedAtDesc(keyword, pageable);
+        return searchBoards.stream()
+                .map(BoardListResponse::from)
+                .toList();
     }
 
     // 게시글 상세 조회
@@ -72,15 +80,13 @@ public class BoardService {
         return BoardResponse.from(board, commentResponses);
     }
 
-    // TODO: 게시글 조회 - 유저 id
-
     // 게시글 수정
     public BoardResponse updateBoard(Integer boardId, BoardUpdate boardUpdate){
         Board board = boardRepository.findById(boardId).orElseThrow(() ->
                 new IllegalArgumentException("존재하지 않는 게시판입니다. id: " + boardId));
 
         if(boardUpdate.update(board)){
-            board.setModifiedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            board.setModifiedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             boardRepository.save(board);
             return BoardResponse.from(board, null);
         }

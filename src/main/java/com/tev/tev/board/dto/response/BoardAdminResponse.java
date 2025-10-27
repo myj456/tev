@@ -6,26 +6,26 @@ import lombok.Data;
 
 @Data
 @Builder
-public class BoardListResponse {
+public class BoardAdminResponse {
     private Integer boardId;
     private String title;
     private String content;
     private String nickname;
-    private String createdAt;
-    private String modifiedAt;
     private Long viewCount;
     private Long likeCount;
+    private String createdAt;
+    private String modifiedAt;
 
-    public static BoardListResponse from(Board board){
-        return BoardListResponse.builder()
+    public static BoardAdminResponse from(Board board){
+        return BoardAdminResponse.builder()
                 .boardId(board.getBoardId())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .nickname(board.getUser().getNickname())
-                .createdAt(board.getCreatedAt())
-                .modifiedAt(board.getModifiedAt())
                 .viewCount(board.getViewCount())
                 .likeCount(board.getLikeCount())
+                .createdAt(board.getCreatedAt())
+                .modifiedAt(board.getModifiedAt())
                 .build();
     }
 }

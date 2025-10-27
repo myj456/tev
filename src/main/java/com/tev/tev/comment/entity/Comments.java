@@ -1,5 +1,6 @@
 package com.tev.tev.comment.entity;
 
+import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.board.entity.Board;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,11 +35,11 @@ public class Comments {
     private String modifiedAt;
 
     @Comment("게시글 id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 
-    // CRUD 완료후 매핑할 예정.
-//    @Comment("댓글 작성자")
-//    private Integer userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
