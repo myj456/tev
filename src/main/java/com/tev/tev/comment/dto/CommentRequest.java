@@ -7,6 +7,7 @@ import com.tev.tev.comment.entity.Comments;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 @Builder
 public class CommentRequest {
 
-    @Max(200)
+    @Size(min = 1, max = 200)
     @NotNull(message = "댓글 내용은 필수 값입니다.")
     @NotBlank(message = "댓글은 필수 값입니다.")
     private String content;

@@ -54,8 +54,11 @@ public class Board {
     @Builder.Default
     private Long likeCount = 0L;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Likes> likes;
+
     @Comment("댓글 리스트")
-    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comments> commentsList;
 
     @ManyToOne(fetch = FetchType.LAZY)

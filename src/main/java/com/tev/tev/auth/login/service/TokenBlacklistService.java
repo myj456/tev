@@ -1,4 +1,4 @@
-package com.tev.tev.auth.login;
+package com.tev.tev.auth.login.service;
 
 import com.tev.tev.auth.login.jwt.TokenProvider;
 import com.tev.tev.redis.dao.RedisDao;

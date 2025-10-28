@@ -23,7 +23,7 @@ public class JoinController {
 
     // 유저 회원가입(생성)
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<String>> userCreate(@Valid @RequestBody UserCreate userCreate){
+    public ResponseEntity<ApiResponse<String>> userCreate(@RequestBody @Valid UserCreate userCreate){
         // 이메일 중복 처리
         if(userRepository.existsByEmail(userCreate.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT)

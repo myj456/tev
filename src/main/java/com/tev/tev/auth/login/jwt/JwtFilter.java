@@ -1,6 +1,7 @@
 package com.tev.tev.auth.login.jwt;
 
-import com.tev.tev.auth.login.TokenBlacklistService;
+import com.tev.tev.auth.admin.service.AdminService;
+import com.tev.tev.auth.login.service.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final TokenBlacklistService tokenBlacklistService;
 
+    private final AdminService adminService;
+
     // 실제 필터링 로직 수행
     // JWT 토큰의 인증 정보를 SecurityContext 에 저장
     @Override
@@ -38,6 +41,19 @@ public class JwtFilter extends OncePerRequestFilter {
             if(tokenProvider.validateToken(jwt) && !tokenBlacklistService.isBlacklisted(jwt)){
                 // 해당 토큰의 Authentication 조회 후 SecurityContext 에 저장
                 Authentication authentication = tokenProvider.getAuthentication(jwt);
+
+                String email = authentication.getName();
+
+                if(adminService.userBlockCheck(email)){
+                    log.info("user is blocked. blacklisting the token and denying access. email=" + email);
+
+                    tokenBlacklistService.addBlacklist(jwt);
+
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Your account has been blocked.");
+                    return;
+                }
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.info("Save authentication in SecurityContextHolder.");
             } else {

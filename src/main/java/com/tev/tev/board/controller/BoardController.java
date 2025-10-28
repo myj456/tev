@@ -80,7 +80,7 @@ public class BoardController {
     }
 
     @DeleteMapping("/{boardid}/delete")
-    public ResponseEntity<ApiResponse<String>> deleteBoard(@PathVariable("boarid") Integer boardId){
+    public ResponseEntity<ApiResponse<String>> deleteBoard(@PathVariable("boardid") Integer boardId){
         if(!boardRepository.existsById(boardId)){
             return ResponseEntity.badRequest()
                     .body(ApiResponse.fail("존재하지 않는 게시글입니다. id: " + boardId));

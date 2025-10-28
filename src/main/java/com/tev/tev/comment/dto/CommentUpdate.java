@@ -2,6 +2,7 @@ package com.tev.tev.comment.dto;
 
 import com.tev.tev.comment.entity.Comments;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 public class CommentUpdate {
-    @Max(200)
+    @Size(min = 0, max = 200)
     private String content;
 
     public boolean update(Comments comments){

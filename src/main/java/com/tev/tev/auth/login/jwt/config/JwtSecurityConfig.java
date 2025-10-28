@@ -1,6 +1,7 @@
 package com.tev.tev.auth.login.jwt.config;
 
-import com.tev.tev.auth.login.TokenBlacklistService;
+import com.tev.tev.auth.admin.service.AdminService;
+import com.tev.tev.auth.login.service.TokenBlacklistService;
 import com.tev.tev.auth.login.jwt.JwtFilter;
 import com.tev.tev.auth.login.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,13 @@ public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurity
 
     private final TokenProvider tokenProvider;
     private final TokenBlacklistService tokenBlacklistService;
+    private final AdminService adminService;
 
     // TokenProvider 주입 후 JwtFilter를 통해 Security 로직에 필터 등록
     @Override
     public void configure(HttpSecurity http){
         http.addFilterBefore(
-                new JwtFilter(tokenProvider, tokenBlacklistService),
+                new JwtFilter(tokenProvider, tokenBlacklistService, adminService),
                 UsernamePasswordAuthenticationFilter.class);
     }
 }

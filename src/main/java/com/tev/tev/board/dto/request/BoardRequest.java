@@ -5,6 +5,7 @@ import com.tev.tev.board.entity.Board;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,12 +20,12 @@ import java.time.format.DateTimeFormatter;
 @Builder
 public class BoardRequest {
 
-    @Max(50)
+    @Size(min = 1, max = 50)
     @NotNull(message = "제목은 필수 값입니다.")
     @NotBlank(message = "제목은 필수 값입니다.")
     private String title;
 
-    @Max(1000)
+    @Size(min = 1, max = 2000)
     @NotNull(message = "게시글 내용은 필수 값입니다.")
     @NotBlank(message = "게시글 내용은 필수 값입니다.")
     private String content;

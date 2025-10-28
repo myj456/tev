@@ -1,6 +1,7 @@
 package com.tev.tev.config;
 
-import com.tev.tev.auth.login.TokenBlacklistService;
+import com.tev.tev.auth.admin.service.AdminService;
+import com.tev.tev.auth.login.service.TokenBlacklistService;
 import com.tev.tev.auth.login.jwt.JwtAccessDeniedHandler;
 import com.tev.tev.auth.login.jwt.JwtAuthenticationEntryPoint;
 import com.tev.tev.auth.login.jwt.TokenProvider;
@@ -27,6 +28,8 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final TokenBlacklistService tokenBlacklistService;
+
+    private final AdminService adminService;
 
     // Bcrypt 암호화 Bean 등록
     @Bean
@@ -63,7 +66,7 @@ public class SecurityConfig {
                 .addFilterBefore(corsConfig.corsFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스 적용
-                .with(new JwtSecurityConfig(tokenProvider, tokenBlacklistService), customizer -> {});
+                .with(new JwtSecurityConfig(tokenProvider, tokenBlacklistService, adminService), customizer -> {});
         return http.build();
     }
 }
