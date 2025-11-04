@@ -8,6 +8,7 @@ import com.tev.tev.board.dto.response.BoardResponse;
 import com.tev.tev.board.dto.request.BoardUpdate;
 import com.tev.tev.board.entity.Board;
 import com.tev.tev.board.repository.BoardRepository;
+import com.tev.tev.board.repository.LikeRepository;
 import com.tev.tev.comment.dto.CommentResponse;
 import com.tev.tev.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class BoardService {
     private final CommentService commentService;
 
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
 
     // 게시글 생성
     public Integer saveBoard(BoardRequest boardRequest){
@@ -76,8 +78,17 @@ public class BoardService {
         board.setViewCount(board.getViewCount());
         boardRepository.save(board);
 
-        List<CommentResponse> commentResponses = commentService.commentGetList(cursorId, pageSize);
-        return BoardResponse.from(board, commentResponses);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetails userDetails = (UserDetails) principal;
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        boolean liked = likeRepository.existsByUserAndBoard(user, board);
+
+        BoardResponse response = BoardResponse.from(board);
+        response.setLiked(liked);
+
+        return response;
     }
 
     // 게시글 수정
@@ -88,7 +99,7 @@ public class BoardService {
         if(boardUpdate.update(board)){
             board.setModifiedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             boardRepository.save(board);
-            return BoardResponse.from(board, null);
+            return BoardResponse.from(board);
         }
 
         //TODO: 커스텀 예외처리로 변경 ()

@@ -5,8 +5,8 @@ spring:
 # Mysql Setting
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/tev
-    username: ${SQL_UN}
+    url: jdbc:mysql://localhost:3306/tev?&serverTimezone=Asia/Seoul
+    username: ${SQL_NM}
     password: ${SQL_PW}
 
 # JPA Setting
@@ -18,7 +18,7 @@ spring:
         format-sql: true
 
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
 
   # Redis 설정
   data:
@@ -36,5 +36,5 @@ jwt:
 
 server:
   port: 8090
-  
+
   

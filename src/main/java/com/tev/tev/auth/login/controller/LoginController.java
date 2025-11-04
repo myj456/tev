@@ -7,7 +7,9 @@ import com.tev.tev.auth.login.jwt.dto.RefreshTokenRequest;
 import com.tev.tev.auth.login.jwt.dto.TokenDto;
 import com.tev.tev.auth.login.jwt.dto.TokenResponse;
 import com.tev.tev.auth.user.dto.UserBlockResponse;
+import com.tev.tev.auth.user.dto.UserListResponse;
 import com.tev.tev.auth.user.dto.UserLogin;
+import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.common.ApiResponse;
 import com.tev.tev.auth.login.service.LoginService;
 import jakarta.validation.Valid;
@@ -17,6 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -94,5 +98,15 @@ public class LoginController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error(e.getMessage()));
         }
+    }
+
+    @GetMapping("/data")
+    public ResponseEntity<ApiResponse<UserListResponse>> getUserNickname(@AuthenticationPrincipal UserDetails userDetails){
+        String email = userDetails.getUsername();
+
+        UserListResponse userListResponse = loginService.getUserData(email);
+
+        return ResponseEntity
+                .ok(ApiResponse.success(userListResponse));
     }
 }

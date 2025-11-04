@@ -4,7 +4,9 @@ import com.tev.tev.auth.login.jwt.TokenProvider;
 import com.tev.tev.auth.login.jwt.dto.RefreshTokenRequest;
 import com.tev.tev.auth.login.jwt.dto.TokenDto;
 import com.tev.tev.auth.login.jwt.dto.TokenResponse;
+import com.tev.tev.auth.user.dto.UserListResponse;
 import com.tev.tev.auth.user.dto.UserLogin;
+import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.auth.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,5 +88,13 @@ public class LoginService {
     public void logout(String accessToken, String email){
         tokenProvider.deleteRefreshToken(email);
         tokenBlacklistService.addBlacklist(accessToken);
+    }
+
+    // 유저 닉네임 조회
+    public UserListResponse getUserData(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다. email=" + email));
+
+        return UserListResponse.from(user);
     }
 }

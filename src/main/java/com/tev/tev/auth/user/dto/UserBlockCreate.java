@@ -1,6 +1,7 @@
 package com.tev.tev.auth.user.dto;
 
 import com.tev.tev.auth.user.entity.Block;
+import com.tev.tev.auth.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,12 +18,12 @@ public class UserBlockCreate {
     private String reason;
     private LocalDateTime expiryAt;
 
-    public Block toEntity(){
+    public Block toEntity(User user){
         return Block.builder()
-                .blockedUserId(this.userId)
                 .reason(this.reason)
                 .blockAt(LocalDateTime.now())
                 .expiryAt(this.expiryAt)
+                .user(user)
                 .build();
     }
 }

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -16,12 +18,17 @@ public class UserBlockResponse {
     private String message;
     private String reason;
     private LocalDateTime expiryAt;
+    private String nickname;
+    private Integer userId;
 
-    public UserBlockResponse from(String message, Block block){
+    public static UserBlockResponse from(String message, Block block){
+
         return UserBlockResponse.builder()
                 .message(message)
                 .reason(block.getReason())
                 .expiryAt(block.getExpiryAt())
+                .nickname(block.getUser().getNickname())
+                .userId(block.getUser().getUserId())
                 .build();
     }
 }

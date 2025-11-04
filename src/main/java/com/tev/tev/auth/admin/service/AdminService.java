@@ -53,20 +53,17 @@ public class AdminService {
 
     // 차단 추가
     public void userBlockCreate(UserBlockCreate userBlockCreate){
-
-        Integer userId = userBlockCreate.getUserId();
-
         User user = userRepository.findById(userBlockCreate.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
-        if(blockRepository.existsByBlockedUserId(userId)){
+        if(blockRepository.existsByUser(user)){
             if(user.getRole() == Roles.ROLE_BLOCK){
-                throw new IllegalArgumentException("이미 차단된 유저입니다. userId=" + userId);
+                throw new IllegalArgumentException("이미 차단된 유저입니다. userId=" + user.getUserId());
             }
         }
 
         // 차단 목록 추가
-        Block block = userBlockCreate.toEntity();
+        Block block = userBlockCreate.toEntity(user);
         blockRepository.save(block);
 
         // 해당 유저의 권한을 BLOCK로 변경
@@ -75,16 +72,15 @@ public class AdminService {
     }
 
     // 차단 취소
-    public void userBlockDelete(Integer blockedUserId){
-        System.out.print("userId=" + blockedUserId);
+    public void userBlockDelete(Integer userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다. userId=" + userId));
 
         // 차단 목록 삭제
-        Block block = blockRepository.findByBlockedUserId(blockedUserId);
+        Block block = blockRepository.findByUser(user);
         blockRepository.delete(block);
 
         // 해당 유저 권한 USER 변경
-        User user = userRepository.findById(blockedUserId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다. blockedUserId=" + blockedUserId));
         user.setRole(Roles.ROLE_USER);
         userRepository.save(user);
     }
@@ -96,8 +92,8 @@ public class AdminService {
         Roles userRole = user.getRole();
         Integer userId = user.getUserId();
 
-        if(userRole == Roles.ROLE_BLOCK ||  blockRepository.existsByBlockedUserId(userId)){
-            Block block = blockRepository.findByBlockedUserId(userId);
+        if(userRole == Roles.ROLE_BLOCK ||  blockRepository.existsByUser(user)){
+            Block block = blockRepository.findByUser(user);
 
             if(block == null){
                 userBlockDelete(userId);
@@ -123,11 +119,9 @@ public class AdminService {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
-            Integer userId = user.getUserId();
+            Block block = blockRepository.findByUser(user);
 
-            Block block = blockRepository.findByBlockedUserId(userId);
-
-            return new UserBlockResponse()
+            return UserBlockResponse
                     .from(email + "은 현재 차단된 상태입니다.", block);
         }
 

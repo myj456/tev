@@ -1,5 +1,6 @@
 package com.tev.tev.auth.user.dto;
 
+import com.tev.tev.auth.user.entity.Block;
 import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.board.dto.response.BoardAdminResponse;
 import com.tev.tev.comment.dto.CommentResponse;
@@ -22,6 +23,7 @@ public class UserDetailResponse {
     private String createdAt;
     private List<BoardAdminResponse> boardList;
     private List<CommentResponse> commentList;
+    private UserBlockResponse block;
 
     // entity -> dto
     public static UserDetailResponse from(User user){
@@ -37,6 +39,7 @@ public class UserDetailResponse {
                 .commentList(user.getCommentList().stream()
                         .map(CommentResponse::from)
                         .toList())
+                .block(UserBlockResponse.from("차단 상태입니다.", user.getBlock()))
                 .build();
     }
 }

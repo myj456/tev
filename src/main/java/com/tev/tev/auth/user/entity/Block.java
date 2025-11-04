@@ -34,6 +34,7 @@ public class Block {
     private LocalDateTime expiryAt;
 
     @Comment("유저 식별자")
-    @Column(name = "blocked_user_id")
-    private Integer blockedUserId;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

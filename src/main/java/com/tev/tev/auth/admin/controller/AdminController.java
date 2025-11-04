@@ -58,7 +58,7 @@ public class AdminController {
 
     // 유저 차단 취소
     @DeleteMapping("/block/cancel")
-    public ResponseEntity<ApiResponse<String>> userBlockCancel(@RequestParam("blockuserid") Integer userId){
+    public ResponseEntity<ApiResponse<String>> userBlockCancel(@RequestParam("userid") Integer userId){
         adminService.userBlockDelete(userId);
 
         return ResponseEntity
