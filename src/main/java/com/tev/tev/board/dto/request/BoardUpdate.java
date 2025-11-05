@@ -1,7 +1,6 @@
 package com.tev.tev.board.dto.request;
 
 import com.tev.tev.board.entity.Board;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

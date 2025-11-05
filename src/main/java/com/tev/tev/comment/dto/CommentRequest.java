@@ -1,11 +1,9 @@
 package com.tev.tev.comment.dto;
 
-import com.tev.tev.auth.user.entity.Block;
 import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.board.entity.Board;
 import com.tev.tev.comment.entity.Comments;
 
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

@@ -22,6 +22,4 @@ public class LikeResponse {
                 .userId(likes.getUser().getUserId())
                 .build();
     }
-
-
 }

@@ -1,6 +1,5 @@
 package com.tev.tev.board.dto.response;
 
-import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.board.entity.Board;
 import com.tev.tev.comment.dto.CommentResponse;
 import lombok.Builder;

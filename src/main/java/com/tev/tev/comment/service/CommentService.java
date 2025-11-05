@@ -73,8 +73,6 @@ public class CommentService {
         return hasNext ? comments.subList(0, pageSize) : comments;
     }
 
-
-
     // 댓글 수정
     public CommentResponse commentEdit(Integer boardId, Integer commentId, CommentUpdate commentUpdate){
         Board board = boardRepository.findById(boardId).orElseThrow(() ->

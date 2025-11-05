@@ -2,7 +2,6 @@ package com.tev.tev.board.dto.request;
 
 import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.board.entity.Board;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

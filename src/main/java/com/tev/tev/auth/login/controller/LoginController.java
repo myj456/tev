@@ -9,7 +9,6 @@ import com.tev.tev.auth.login.jwt.dto.TokenResponse;
 import com.tev.tev.auth.user.dto.UserBlockResponse;
 import com.tev.tev.auth.user.dto.UserListResponse;
 import com.tev.tev.auth.user.dto.UserLogin;
-import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.common.ApiResponse;
 import com.tev.tev.auth.login.service.LoginService;
 import jakarta.validation.Valid;

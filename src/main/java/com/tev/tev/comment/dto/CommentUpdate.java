@@ -1,7 +1,6 @@
 package com.tev.tev.comment.dto;
 
 import com.tev.tev.comment.entity.Comments;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

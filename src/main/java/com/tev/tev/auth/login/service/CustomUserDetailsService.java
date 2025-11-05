@@ -1,7 +1,6 @@
 package com.tev.tev.auth.login.service;
 
 import com.tev.tev.auth.login.CustomUserDetails;
-import com.tev.tev.auth.user.dto.UserCreate;
 import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.auth.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +29,4 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return CustomUserDetails.from(user);
     }
-
-
 }

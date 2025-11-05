@@ -1,16 +1,12 @@
 package com.tev.tev.auth.join.service;
 
 import com.tev.tev.auth.user.dto.UserCreate;
-import com.tev.tev.auth.user.entity.Roles;
 import com.tev.tev.auth.user.entity.User;
 import com.tev.tev.auth.user.repository.UserRepository;
 import com.tev.tev.common.exception.DuplicateResourceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor

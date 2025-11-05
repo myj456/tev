@@ -80,5 +80,4 @@ public class CommentController {
         return ResponseEntity
                 .ok(ApiResponse.success("댓글 삭제 성공 id: " + commentId));
     }
-
 }

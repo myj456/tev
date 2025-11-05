@@ -11,4 +11,6 @@ public interface BlockRepository extends JpaRepository<Block, Integer> {
     boolean existsByUser(User user);
 
     Block findByUser(User user);
+
+    void deleteByUser_UserId(Integer userId);
 }

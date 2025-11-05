@@ -9,7 +9,6 @@ import com.tev.tev.board.dto.request.BoardUpdate;
 import com.tev.tev.board.entity.Board;
 import com.tev.tev.board.repository.BoardRepository;
 import com.tev.tev.board.repository.LikeRepository;
-import com.tev.tev.comment.dto.CommentResponse;
 import com.tev.tev.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -79,14 +78,16 @@ public class BoardService {
         boardRepository.save(board);
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails = (UserDetails) principal;
-        String email = userDetails.getUsername();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        boolean liked = false; // 기본값은 false(좋아요 안 누름)
 
-        boolean liked = likeRepository.existsByUserAndBoard(user, board);
+        if (principal instanceof UserDetails userDetails) { // 로그인한 사용자인지 확인
+            String email = userDetails.getUsername();
+            User user = userRepository.findByEmail(email).orElseThrow();
+            liked = likeRepository.existsByUserAndBoard(user, board);
+        }
 
         BoardResponse response = BoardResponse.from(board);
-        response.setLiked(liked);
+        response.setLiked(liked); // 로그인 여부에 따라 결정된 liked 값을 설정
 
         return response;
     }

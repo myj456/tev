@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.redis.connection.StringRedisConnection;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 

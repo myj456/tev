@@ -61,7 +61,7 @@ public class LikeService {
         return LikeResponse.from(likes);
     }
 
-    public boolean hasUserLikedBoard(User user, Board board) {
-        return likeRepository.existsByUserAndBoard(user, board);
-    }
+//    public boolean hasUserLikedBoard(User user, Board board) {
+//        return likeRepository.existsByUserAndBoard(user, board);
+//    }
 }
